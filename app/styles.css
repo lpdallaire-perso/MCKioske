@@ -31,7 +31,7 @@ h1 { margin:0; font-size:clamp(1.55rem,3vw,2.45rem); line-height:1.05; }
 .wheel-hub strong>span { display:block; }
 .hub-line { display:inline-flex!important; align-items:center; justify-content:center; gap:7px; }
 .wheel-hub em { display:inline-grid; place-items:center; width:30px; height:30px; color:#fff; border-radius:50%; background:var(--green); font-size:.75rem; line-height:1; font-style:normal; }
-.pointer { position:absolute; z-index:3; left:50%; top:-9px; transform:translateX(-50%); width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:30px solid var(--navy); filter:drop-shadow(0 2px 1px #fff); }
+.pointer { position:absolute; z-index:3; left:50%; top:-9px; transform:translateX(-50%); transform-origin:50% 0; width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:30px solid var(--navy); filter:drop-shadow(0 2px 1px #fff); }
 .primary-button { min-height:46px; padding:0 24px; border:0; border-radius:7px; color:#fff; background:var(--green); font-weight:700; cursor:pointer; transition:background .2s, transform .2s; }
 .primary-button:hover { background:var(--green-dark); transform:translateY(-1px); }
 .primary-button:disabled { opacity:.55; cursor:wait; transform:none; }

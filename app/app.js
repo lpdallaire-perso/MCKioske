@@ -1,4 +1,4 @@
-const state = { config: null, round: 0, score: 0, selectedCategory: null, currentQuestion: null, rotation: 0, spinTimer: null, revealTimer: null, autoResetTimer: null, usedCategoryIds: new Set(), sessionResults: [], statsRecorded: false };
+const state = { config: null, round: 0, score: 0, selectedCategory: null, currentQuestion: null, rotation: 0, spinTimer: null, revealTimer: null, autoResetTimer: null, pointerFrame: null, pointerAnimation: null, usedCategoryIds: new Set(), sessionResults: [], statsRecorded: false };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -264,6 +264,43 @@ function updateStatus() {
   $('#remaining-total').textContent = remaining;
 }
 
+function wheelAngle() {
+  const transform = window.getComputedStyle($('#wheel')).transform;
+  if (transform === 'none') return 0;
+  const values = transform.slice(transform.indexOf('(') + 1, -1).split(',').map(Number);
+  return Math.atan2(values[1], values[0]) * 180 / Math.PI;
+}
+
+function stopPointerTracking() {
+  if (state.pointerFrame) window.cancelAnimationFrame(state.pointerFrame);
+  if (state.pointerAnimation) state.pointerAnimation.cancel();
+  state.pointerFrame = null;
+  state.pointerAnimation = null;
+}
+
+function startPointerTracking(slice) {
+  stopPointerTracking();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let previousSector = null;
+  const pointer = $('.pointer');
+  const track = () => {
+    const angle = ((wheelAngle() % 360) + 360) % 360;
+    const sector = Math.floor(((angle + slice / 2) % 360) / slice);
+    if (previousSector !== null && sector !== previousSector) {
+      if (state.pointerAnimation) state.pointerAnimation.cancel();
+      state.pointerAnimation = pointer.animate([
+        { transform: 'translateX(-50%) rotate(0deg)' },
+        { transform: 'translateX(-50%) rotate(-11deg)', offset: .35 },
+        { transform: 'translateX(-50%) rotate(4deg)', offset: .7 },
+        { transform: 'translateX(-50%) rotate(0deg)' }
+      ], { duration: 140, easing: 'ease-out' });
+    }
+    previousSector = sector;
+    if (state.spinTimer) state.pointerFrame = window.requestAnimationFrame(track);
+  };
+  state.pointerFrame = window.requestAnimationFrame(track);
+}
+
 function spin() {
   if (state.spinTimer || state.revealTimer || hasReachedEnd()) return;
   clearAutoReset();
@@ -294,6 +331,7 @@ function spin() {
   $('#wheel').style.transform = `rotate(${state.rotation}deg)`;
   state.spinTimer = window.setTimeout(() => {
     state.spinTimer = null;
+    stopPointerTracking();
     trigger.classList.remove('spinning');
     trigger.setAttribute('aria-disabled', 'false');
     $('#selection-announcement').textContent = state.selectedCategory.name;
@@ -307,6 +345,7 @@ function spin() {
       }, 420);
     }, state.config.selectedCategoryDelayMs);
   }, duration);
+  startPointerTracking(slice);
 }
 
 function showQuestion() {
@@ -380,6 +419,7 @@ function showResult() {
 function restart() {
   if (state.spinTimer) window.clearTimeout(state.spinTimer);
   if (state.revealTimer) window.clearTimeout(state.revealTimer);
+  stopPointerTracking();
   clearAutoReset();
   state.spinTimer = null;
   state.revealTimer = null;
