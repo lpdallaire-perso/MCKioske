@@ -23,7 +23,10 @@ L'acces aux statistiques est protege par le mot de passe `statsPassword` dans `a
 Toute l'activite est definie dans `app/activity.js` :
 
 - `title`, `organization` et `welcome` controlent les textes d'accueil;
-- `questionsPerGame` determine le nombre de questions par partie;
+- `questionsPerGame` determine le nombre de questions par partie; la valeur `0` active le mode infini, masque le suivi du nombre de questions et supprime l'ecran final;
+- `resultAutoResetSeconds` determine le delai avant le retour automatique a l'accueil depuis l'ecran final;
+- `sessionAutoResetSeconds` determine le delai d'attente d'un nouveau tour de roue avant d'abandonner et de remettre a zero une session ayant au moins une question completee; il ne s'active jamais avant le premier tour;
+- la valeur `0` desactive la remise a zero automatique du timer concerne;
 - `spinDurationMs` determine la duree exacte de rotation de la roue, en millisecondes;
 - `selectedCategoryDelayMs` determine le temps d'affichage de la categorie choisie avant l'apparition de l'affirmation;
 - `categories` alimente automatiquement les sections de la roue;

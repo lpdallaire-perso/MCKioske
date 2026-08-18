@@ -1,4 +1,4 @@
-const state = { config: null, round: 0, score: 0, selectedCategory: null, currentQuestion: null, rotation: 0, spinTimer: null, revealTimer: null, usedCategoryIds: new Set(), sessionResults: [], statsRecorded: false };
+const state = { config: null, round: 0, score: 0, selectedCategory: null, currentQuestion: null, rotation: 0, spinTimer: null, revealTimer: null, autoResetTimer: null, usedCategoryIds: new Set(), sessionResults: [], statsRecorded: false };
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -17,6 +17,15 @@ function validateConfig(config) {
   if (!Number.isFinite(config.spinDurationMs) || config.spinDurationMs < 1000) {
     throw new Error('spinDurationMs doit être un nombre supérieur ou égal à 1000.');
   }
+  if (!Number.isInteger(config.questionsPerGame) || config.questionsPerGame < 0) {
+    throw new Error('questionsPerGame doit être un nombre entier supérieur ou égal à 0.');
+  }
+  ['resultAutoResetSeconds', 'sessionAutoResetSeconds'].forEach(option => {
+    if (config[option] === undefined) config[option] = 0;
+    if (!Number.isFinite(config[option]) || config[option] < 0) {
+      throw new Error(`${option} doit être un nombre supérieur ou égal à 0.`);
+    }
+  });
   if (config.selectedCategoryDelayMs === undefined) config.selectedCategoryDelayMs = 2500;
   if (!Number.isFinite(config.selectedCategoryDelayMs) || config.selectedCategoryDelayMs < 0) {
     throw new Error('selectedCategoryDelayMs doit être un nombre supérieur ou égal à 0.');
@@ -29,6 +38,30 @@ function validateConfig(config) {
       throw new Error(`La catégorie « ${category.name || 'sans nom'} » est incomplète.`);
     }
   });
+}
+
+function isInfiniteMode() {
+  return state.config.questionsPerGame === 0;
+}
+
+function hasReachedEnd() {
+  return !isInfiniteMode() && state.round >= state.config.questionsPerGame;
+}
+
+function clearAutoReset() {
+  if (state.autoResetTimer) window.clearTimeout(state.autoResetTimer);
+  state.autoResetTimer = null;
+}
+
+function scheduleAutoReset(delaySeconds) {
+  clearAutoReset();
+  if (delaySeconds === 0) return;
+  state.autoResetTimer = window.setTimeout(restart, delaySeconds * 1000);
+}
+
+function scheduleSessionAutoReset() {
+  if (state.round === 0) return;
+  scheduleAutoReset(state.config.sessionAutoResetSeconds);
 }
 
 function categoryIcon(category) {
@@ -180,6 +213,7 @@ function renderActivity() {
   $('#organization').textContent = organization || '';
   $('#welcome-title').textContent = welcome.title;
   $('#instructions').textContent = welcome.instructions;
+  $('.app-shell').classList.toggle('infinite-mode', isInfiniteMode());
   $('#topic-list').innerHTML = categories.map(c => `<div class="topic">${categoryIcon(c)}<span>${c.name}</span></div>`).join('');
 
   const slice = 360 / categories.length;
@@ -206,13 +240,15 @@ function showView(view, step) {
 }
 
 function updateStatus() {
+  if (isInfiniteMode()) return;
   const remaining = Math.max(0, state.config.questionsPerGame - state.round);
   $('#correct-total').textContent = state.score;
   $('#remaining-total').textContent = remaining;
 }
 
 function spin() {
-  if (state.spinTimer || state.revealTimer || state.round >= state.config.questionsPerGame) return;
+  if (state.spinTimer || state.revealTimer || hasReachedEnd()) return;
+  clearAutoReset();
   const button = $('#spin-button');
   const trigger = $('#wheel-trigger');
   const duration = state.config.spinDurationMs;
@@ -261,9 +297,9 @@ function showQuestion() {
   const pool = candidates.length ? candidates : category.questions;
   state.currentQuestion = pool[Math.floor(Math.random() * pool.length)];
   state.currentQuestion._asked = true;
-  $('#question-count').textContent = `Question ${state.round + 1} / ${state.config.questionsPerGame}`;
+  $('#question-count').textContent = isInfiniteMode() ? `Question ${state.round + 1}` : `Question ${state.round + 1} / ${state.config.questionsPerGame}`;
   $('#score-count').textContent = `${state.score} bonne${state.score > 1 ? 's' : ''} réponse${state.score > 1 ? 's' : ''}`;
-  $('#progress-bar').style.width = `${(state.round / state.config.questionsPerGame) * 100}%`;
+  $('#progress-bar').style.width = isInfiniteMode() ? '0%' : `${(state.round / state.config.questionsPerGame) * 100}%`;
   $('#category-heading').innerHTML = `${categoryIcon(category)}<span>${category.name}</span>`;
   $('#question-text').textContent = state.currentQuestion.text;
   $('#spin-button').disabled = false;
@@ -287,15 +323,16 @@ function answer(value) {
   $('#feedback-explanation').textContent = state.currentQuestion.explanation;
   $('#takeaway-text').textContent = state.currentQuestion.takeaway || '';
   $('#feedback-takeaway').hidden = !state.currentQuestion.takeaway;
-  $('#next-button').textContent = state.round >= state.config.questionsPerGame ? 'Voir mon résultat' : 'Question suivante';
+  $('#next-button').textContent = hasReachedEnd() ? 'Voir mon résultat' : 'Question suivante';
   showView('feedback', 4);
 }
 
 function next() {
-  if (state.round >= state.config.questionsPerGame) return showResult();
+  if (hasReachedEnd()) return showResult();
   showView('welcome', 1);
   $('#welcome-title').textContent = 'Prêt pour la prochaine question?';
   $('#instructions').textContent = 'Tournez de nouveau la roue pour choisir une catégorie.';
+  scheduleSessionAutoReset();
 }
 
 function showResult() {
@@ -316,11 +353,13 @@ function showResult() {
     </article>
   `).join('');
   showView('result', 5);
+  scheduleAutoReset(state.config.resultAutoResetSeconds);
 }
 
 function restart() {
   if (state.spinTimer) window.clearTimeout(state.spinTimer);
   if (state.revealTimer) window.clearTimeout(state.revealTimer);
+  clearAutoReset();
   state.spinTimer = null;
   state.revealTimer = null;
   state.round = 0; state.score = 0; state.selectedCategory = null; state.currentQuestion = null; state.rotation = 0; state.usedCategoryIds.clear(); state.sessionResults = []; state.statsRecorded = false;
