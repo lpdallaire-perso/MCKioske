@@ -105,7 +105,7 @@ h1 { margin:0; font-size:clamp(1.55rem,3vw,2.45rem); line-height:1.05; }
 .svg-sprite { position:absolute; width:0; height:0; overflow:hidden; }
 .stats-modal { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:32px; background:#0c315466; }
 .stats-modal[hidden] { display:none; }
-.stats-panel { width:min(1120px,100%); max-height:min(820px,90vh); display:grid; grid-template-rows:auto auto auto minmax(120px,1fr) auto; gap:18px; padding:28px; border:1px solid var(--line); border-radius:10px; background:#fff; box-shadow:0 6px 18px #18362730; }
+.stats-panel { width:min(1400px,100%); max-height:min(820px,90vh); display:grid; grid-template-rows:auto auto auto minmax(120px,1fr) auto; gap:18px; padding:28px; border:1px solid var(--line); border-radius:10px; background:#fff; box-shadow:0 6px 18px #18362730; }
 .stats-header,.stats-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .stats-header h2 { margin:0; font-size:2rem; }
 .runtime-settings { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,minmax(180px,1fr)) auto; align-items:end; gap:14px; padding:16px 18px; border:1px solid var(--line); border-radius:10px; background:#f7faf7; }
