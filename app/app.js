@@ -356,7 +356,7 @@ function showQuestion() {
   state.currentQuestion._asked = true;
   $('#question-count').textContent = isInfiniteMode() ? `Question ${state.round + 1}` : `Question ${state.round + 1} / ${state.config.questionsPerGame}`;
   $('#score-count').textContent = `${state.score} bonne${state.score > 1 ? 's' : ''} réponse${state.score > 1 ? 's' : ''}`;
-  $('#progress-bar').style.width = isInfiniteMode() ? '0%' : `${(state.round / state.config.questionsPerGame) * 100}%`;
+  $('#progress-bar').style.width = isInfiniteMode() ? '0%' : `${((state.round + 1) / state.config.questionsPerGame) * 100}%`;
   $('#category-heading').innerHTML = `${categoryIcon(category)}<span>${category.name}</span>`;
   $('#question-text').textContent = state.currentQuestion.text;
   $('#spin-button').disabled = false;
