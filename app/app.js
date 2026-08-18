@@ -304,9 +304,11 @@ function showQuestion() {
   $('#question-text').textContent = state.currentQuestion.text;
   $('#spin-button').disabled = false;
   showView('question', 3);
+  scheduleAutoReset(state.config.resultAutoResetSeconds);
 }
 
 function answer(value) {
+  clearAutoReset();
   const isCorrect = value === state.currentQuestion.answer;
   if (isCorrect) state.score += 1;
   state.sessionResults.push({

@@ -24,7 +24,7 @@ Toute l'activite est definie dans `app/activity.js` :
 
 - `title`, `organization` et `welcome` controlent les textes d'accueil;
 - `questionsPerGame` determine le nombre de questions par partie; la valeur `0` active le mode infini, masque le suivi du nombre de questions et supprime l'ecran final;
-- `resultAutoResetSeconds` determine le delai avant le retour automatique a l'accueil depuis l'ecran final;
+- `resultAutoResetSeconds` determine le delai avant le retour automatique a l'accueil depuis l'ecran final ou depuis une question restee sans reponse;
 - `sessionAutoResetSeconds` determine le delai d'attente d'un nouveau tour de roue avant d'abandonner et de remettre a zero une session ayant au moins une question completee; il ne s'active jamais avant le premier tour;
 - la valeur `0` desactive la remise a zero automatique du timer concerne;
 - `spinDurationMs` determine la duree exacte de rotation de la roue, en millisecondes;
