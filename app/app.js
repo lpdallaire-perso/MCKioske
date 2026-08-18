@@ -289,10 +289,10 @@ function startPointerTracking(slice) {
     if (previousSector !== null && sector !== previousSector) {
       if (state.pointerAnimation) state.pointerAnimation.cancel();
       state.pointerAnimation = pointer.animate([
-        { transform: 'translateX(-50%) rotate(0deg)' },
-        { transform: 'translateX(-50%) rotate(-11deg)', offset: .35 },
-        { transform: 'translateX(-50%) rotate(4deg)', offset: .7 },
-        { transform: 'translateX(-50%) rotate(0deg)' }
+        { transform: 'translate(-50%, 0) scaleX(1)' },
+        { transform: 'translate(-50%, 7px) scaleX(.88)', offset: .35 },
+        { transform: 'translate(-50%, 2px) scaleX(1.03)', offset: .7 },
+        { transform: 'translate(-50%, 0) scaleX(1)' }
       ], { duration: 140, easing: 'ease-out' });
     }
     previousSector = sector;
