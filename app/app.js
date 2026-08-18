@@ -327,6 +327,7 @@ function answer(value) {
   $('#feedback-takeaway').hidden = !state.currentQuestion.takeaway;
   $('#next-button').textContent = hasReachedEnd() ? 'Voir mon résultat' : 'Question suivante';
   showView('feedback', 4);
+  scheduleAutoReset(state.config.resultAutoResetSeconds);
 }
 
 function next() {
