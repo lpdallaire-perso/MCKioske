@@ -153,12 +153,30 @@ function openStats() {
     if (password !== null) window.alert('Mot de passe incorrect.');
     return;
   }
+  $('#runtime-questions').value = state.config.questionsPerGame;
+  $('#runtime-result-reset').value = state.config.resultAutoResetSeconds;
+  $('#runtime-session-reset').value = state.config.sessionAutoResetSeconds;
   renderStats();
   $('#stats-modal').hidden = false;
 }
 
 function closeStats() {
   $('#stats-modal').hidden = true;
+}
+
+function applyRuntimeSettings(event) {
+  event.preventDefault();
+  const questionsPerGame = $('#runtime-questions').valueAsNumber;
+  const resultAutoResetSeconds = $('#runtime-result-reset').valueAsNumber;
+  const sessionAutoResetSeconds = $('#runtime-session-reset').valueAsNumber;
+  if (!Number.isInteger(questionsPerGame) || questionsPerGame < 0 || !Number.isFinite(resultAutoResetSeconds) || resultAutoResetSeconds < 0 || !Number.isFinite(sessionAutoResetSeconds) || sessionAutoResetSeconds < 0) {
+    window.alert('Entrez des nombres valides supérieurs ou égaux à 0.');
+    return;
+  }
+  Object.assign(state.config, { questionsPerGame, resultAutoResetSeconds, sessionAutoResetSeconds });
+  closeStats();
+  renderActivity();
+  restart();
 }
 
 function exportStats() {
@@ -403,6 +421,7 @@ function bindEvents() {
   $('#close-stats-button').addEventListener('click', closeStats);
   $('#export-stats-button').addEventListener('click', exportStats);
   $('#reset-stats-button').addEventListener('click', resetStats);
+  $('#runtime-settings-form').addEventListener('submit', applyRuntimeSettings);
   $('#stats-modal').addEventListener('click', event => {
     if (event.target.id === 'stats-modal') closeStats();
   });

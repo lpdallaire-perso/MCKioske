@@ -107,11 +107,33 @@
         <section class="stats-panel" role="dialog" aria-modal="true" aria-labelledby="stats-title">
           <div class="stats-header">
             <div>
-              <p class="step-label">Journée en cours</p>
-              <h2 id="stats-title">Statistiques</h2>
+              <p class="step-label">Configuration en cours</p>
+              <h2 id="stats-title">Paramètres et statistiques</h2>
             </div>
             <button class="secondary-button" id="close-stats-button" type="button">Fermer</button>
           </div>
+          <form class="runtime-settings" id="runtime-settings-form">
+            <div class="runtime-settings-heading">
+              <h3>Paramètres d’exécution</h3>
+              <p>Ces changements durent jusqu’au prochain rechargement de la page.</p>
+            </div>
+            <label>
+              <span>Nombre de questions</span>
+              <input id="runtime-questions" type="number" min="0" step="1" required />
+              <small>0 = mode infini</small>
+            </label>
+            <label>
+              <span>Délai sur une question, une explication ou le résultat</span>
+              <input id="runtime-result-reset" type="number" min="0" step="1" required />
+              <small>Secondes · 0 = désactivé</small>
+            </label>
+            <label>
+              <span>Délai entre deux tours de roue</span>
+              <input id="runtime-session-reset" type="number" min="0" step="1" required />
+              <small>Secondes · 0 = désactivé</small>
+            </label>
+            <button class="primary-button" type="submit">Appliquer et recommencer</button>
+          </form>
           <div class="stats-summary">
             <div><strong id="stats-player-count">0</strong><span>joueurs</span></div>
             <div><strong id="stats-question-count">0</strong><span>questions vues</span></div>

@@ -18,6 +18,8 @@ Le bouton `Exporter TXT` telecharge un rapport lisible nomme `stats-YYYY-MM-DD.t
 
 L'acces aux statistiques est protege par le mot de passe `statsPassword` dans `app/activity.js`.
 
+La fenetre de parametres permet aussi de modifier `questionsPerGame`, `resultAutoResetSeconds` et `sessionAutoResetSeconds` pendant l'execution. Ces valeurs temporaires sont remises a celles de `app/activity.js` au rechargement de la page.
+
 ## Configuration
 
 Toute l'activite est definie dans `app/activity.js` :
